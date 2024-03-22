@@ -1,0 +1,16 @@
+Pillow
+numpy
+scikit-image
+opencv-python
+matplotlib
+lit
+cmake
+retina-face
+
+# for BLIP use:
+# pip install salesforce-lavis
+
+# For CLIP interrogator use:
+# INCOMPATIBLE with salesforce-lavis
+# conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
+# pip install clip-interrogator==0.6.0
