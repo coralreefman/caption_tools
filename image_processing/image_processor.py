@@ -3,7 +3,6 @@ import json
 from PIL import Image
 from shutil import copyfile
 from . import operations
-from . import face_detection
 from . import captioning
 
 class ImageProcessor:
@@ -16,12 +15,13 @@ class ImageProcessor:
         self.format = args.format
         self.quality = args.quality
 
-        self.face_detection_threshold = args.face_detection_threshold
         self.sd_version = args.sd_version
 
         self.models = models
 
         self.min_size = args.min_size
+
+        self.append_captions = args.append_captions
     
     def open_image(self):
 
@@ -35,25 +35,14 @@ class ImageProcessor:
         else:
             return False
  
+    def convert(self, mode):
+
+        # mode: The mode to convert to. Must be a string like 'RGB', 'RGBA', 'L', etc.
+        self.image = self.image.convert(mode)
+
     def crop_by_percentage(self, amount):
         
         self.image = operations.crop_by_percentage(self.image, amount)
-
-    def crop_from_background(self):
-
-        self.image = operations.crop_from_background(self.image)
-
-    def face_detection_square(self):
-
-        self.faces = face_detection.detect_faces(self.image, self.face_detection_threshold)
-
-        self.image = face_detection.draw_squares(self.image, self.faces)
-
-    def face_detection_blur(self):
-
-        self.faces = face_detection.detect_faces(self.image, self.face_detection_threshold)
-
-        self.image = face_detection.blur_faces(self.image, self.faces)
 
     def save_caption(self):
 
@@ -63,31 +52,28 @@ class ImageProcessor:
 
         caption_path = f'{os.path.splitext(self.out_path)[0]}.txt'
 
-        # file_exists = os.path.isfile(caption_path)
-        # if not file_exists:
-
-        with open(caption_path, 'a') as f:
-
-            # if not file_exists:
-            #     prepend = ''
-            # else:
-            #     if f.tell() == 0:
-            #         prepend = ''
-            #     else:
-            #         prepend = ', '
+        if self.append_captions:
+            mode = 'a'
+            prepend = ', '
+        else:
+            mode = 'w'
             prepend = ''
 
+        with open(caption_path, mode) as f:
+
+            # REMINDER: this checks what captions have been created, maybe confusing to write it this way?
             if hasattr(self, 'caption_blip'):
-                # if self.caption_blip[0] not in f:
                 f.write(f'{prepend}{self.caption_blip[0]}, ')
             if hasattr(self, 'caption_clip'):
                 f.write(f'{prepend}{self.caption_clip}, ')
             if hasattr(self, 'caption_metadata'):
-                # if self.caption_metadata not in f:
                 f.write(f'{prepend}{self.caption_metadata}, ')
+            # Note: maybe useful to implement checking for double captions like so:
+            # if self.caption_blip[0] not in f:
 
     def metadata_caption(self):
 
+        # Note: this is for the dataset from contemporary art daily that contains metadata
         metadata_path = os.path.join(os.path.dirname(self.path), 'metadata.json')
 
         if os.path.exists(metadata_path):
@@ -116,11 +102,6 @@ class ImageProcessor:
     def interrogate_clip(self):
 
         self.caption_clip = captioning.interrogate_clip(self.image, self.models.ci)
-
-    def convert(self, mode):
-
-        # mode: The mode to convert to. Must be a string like 'RGB', 'RGBA', 'L', etc.
-        self.image = self.image.convert(mode)
 
     def copy_metadata(self):
 
