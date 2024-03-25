@@ -19,21 +19,12 @@ class ImageProcessor:
 
         self.models = models
 
-        self.min_size = args.min_size
-
         self.append_captions = args.append_captions
     
     def open_image(self):
 
         self.image = Image.open(self.path).convert('RGB')
         self.width, self.height = self.image.size
-         
-    def is_min_size(self):
-
-        if self.width > self.min_size or self.height > self.min_size:
-            return True
-        else:
-            return False
  
     def convert(self, mode):
 
@@ -68,6 +59,8 @@ class ImageProcessor:
                 f.write(f'{prepend}{self.caption_clip}, ')
             if hasattr(self, 'caption_metadata'):
                 f.write(f'{prepend}{self.caption_metadata}, ')
+            if hasattr(self, 'caption_directory'):
+                f.write(f'{prepend}{self.caption_directory}, ')
             # Note: maybe useful to implement checking for double captions like so:
             # if self.caption_blip[0] not in f:
 
@@ -123,8 +116,13 @@ class ImageProcessor:
 
         if os.path.isfile(captions_in) and not os.path.isfile(captions_out):
             copyfile(captions_in, captions_out)
+        
+    def use_directory_name(self):
 
-    def save(self):
+        directory_path = os.path.dirname(self.path)
+        self.caption_directory = f"in the style of {str(os.path.basename(directory_path))}"
+
+    def save_image(self):
         """
         Save the image to a file.
 

@@ -20,7 +20,10 @@ class Models:
 
             # loads BLIP caption base model, with finetuned checkpoints on MSCOCO captioning dataset.
             # this also loads the associated image processors
-            self.blip_model, self.vis_processors, _ = load_model_and_preprocess(name="blip_caption", model_type="base_coco", is_eval=True, device=DEVICE)
+            # self.blip_model, self.vis_processors, _ = load_model_and_preprocess(name="blip_caption", model_type="base_coco", is_eval=True, device=DEVICE)
+            # self.blip_model, self.vis_processors, _ = load_model_and_preprocess(name="blip2_t5",  model_type="pretrain_flant5xxl", is_eval=True, device=DEVICE)
+            self.blip_model, self.vis_processors, _ = load_model_and_preprocess("blip2_opt", model_type="pretrain_opt2.7b", is_eval=True, device=DEVICE
+            )
 
         elif args.blip_question or args.blip_folder_sort:
 
@@ -90,7 +93,6 @@ def sort_into_folders(image, model, vis_processors, txt_processors):
 
         return "none"
 
-
 def sort_by_questions(image, model, vis_processors, txt_processors):
 
     questions = ['Is there a painting in this image?', 'How many paintings are in this image?', 'Does the painting cover most of the image?']
@@ -125,6 +127,7 @@ def sort_by_questions(image, model, vis_processors, txt_processors):
     else:
         return 'nahh'
     
+# TO DO: implement custom CLIP
 def interrogate_clip(image, ci):
   
     print(ci.interrogate(image))

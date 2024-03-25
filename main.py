@@ -31,10 +31,6 @@ def process_image(image_path, out_path, models, args):
         except Exception as e:
             print(f'An error occurred while processing {image_path}: {e}')
             return
-        
-        if not processor.is_min_size():
-            print(f"image too small, skipping {image_path}")
-            return
 
     # text ops
     if args.blip_caption:
@@ -59,6 +55,8 @@ def process_image(image_path, out_path, models, args):
         processor.interrogate_clip()
     if args.metadata_caption:
         processor.metadata_caption()
+    if args.use_directory_name:
+        processor.use_directory_name()
     if args.save_captions:
         processor.save_caption()
     if args.copy_metadata:
@@ -68,7 +66,7 @@ def process_image(image_path, out_path, models, args):
 
     # Save the edited image
     if args.save_images:
-        processor.save()
+        processor.save_image()
 
 def main():
 
@@ -87,12 +85,11 @@ def main():
     parser.add_argument('--interrogate_clip', action='store_true', help='Use CLIP interrogator to generate a caption for the image')
     parser.add_argument('--save_captions', action='store_true', help='Saves the caption as a .txt next to the image.')
     parser.add_argument('--save_images', action='store_true', help='saves the images to the output folder')
-    # Note: This copies the file from the input folder if there is one NOT the output folder
-    parser.add_argument('--copy_metadata', action='store_true', help='copies metadata.json file if it exists.')
-    parser.add_argument('--copy_captions', action='store_true', help='copies filename.txt file if it exists.')
+    parser.add_argument('--copy_metadata', action='store_true', help='copies metadata.json file from the input folder if it exists.')
+    parser.add_argument('--copy_captions', action='store_true', help='copies filename.txt file from the input folder if it exists.')
     parser.add_argument('--append_captions', action='store_true', help='appends rather than overwrites if there are already captions in the output directory')
     parser.add_argument('--metadata_caption', action='store_true', help='Append artist name to caption if there is a metadata.json in the directory.')
-    parser.add_argument('--use_folder_name', action='store_true', help="appends 'in the style of [folder name]' to the caption")
+    parser.add_argument('--use_directory_name', action='store_true', help="appends 'in the style of [folder name]' to the caption")
     parser.add_argument('--skip_existing_files', action='store_true', help='skips processing file if output file already exists.')
     parser.add_argument('--sd_version', type=int, default=1, help='Which version of stable diffusion to optimize for, mainly for CLIP interrogator. Can be 1 or 2')
     parser.add_argument('--threadpool', action='store_true', help='can be used to accelerate non-ai functions.')
