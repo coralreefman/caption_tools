@@ -3,6 +3,11 @@ import argparse
 
 def main():
 
+    '''
+    Removes .txt files from a folder if there is a matching .jpg file 
+    TO DO: should accept various file formats for both files
+    SHOULD be integrated into helper functions
+    '''
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('path', type=str, help='The path to the image file or folder.')
     args = parser.parse_args()
@@ -12,7 +17,6 @@ def main():
         for dirpath, dirnames, filenames in os.walk(args.path):
             for filename in filenames:
                 if filename.lower().endswith(('.txt')):
-
 
                     file_path = os.path.join(dirpath, filename)
 

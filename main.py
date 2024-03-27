@@ -7,6 +7,9 @@ import time
 
 def process_image(image_path, out_path, models, args):
 
+    # TO DO: Is this neccessary?
+    # think about rather creating two modes, or just figure out a more elegant way if images need to be opened or not
+
     image_operations = [
         args.blip_caption, 
         args.blip_question, 
@@ -70,12 +73,14 @@ def process_image(image_path, out_path, models, args):
 
 def main():
 
+    # BIG TO DO: Create config file
     start = time.time()
 
     parser = argparse.ArgumentParser(description='Apply image processing operations to an image or a folder of images.')
     parser.add_argument('path', type=str, help='The path to the image file or folder.')
     parser.add_argument('--output_dir', type=str, default='output', help='The path to a folder where to save the edited image(s) and caption(s).')
     parser.add_argument('--single_output_dir', action='store_true', help='If not enabled, program copies existing folder structure. Enable if single folder output is desired')
+    parser.add_argument('--mode', type=str, default='BLIP', help='Use either BLIP or CLIP.')
     parser.add_argument('--format', type=str, default='JPEG', help='The format to use for the saved image(s).')
     parser.add_argument('--quality', type=int, default=100, help='The quality to use for the saved image(s).')
     parser.add_argument('--text_only', action='store_true', help='skips opening and processing images')
